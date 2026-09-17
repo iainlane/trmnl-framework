@@ -84,6 +84,9 @@ scope :framework do
 
     get '/:version/example_iframe_config', to: 'framework#example_iframe_config', constraints: { version: framework_docs_version_constraint }, defaults: { version: current_docs_version }, as: :framework_docs_example_iframe_config, format: false
 
+    # The command palette's list, fetched on first open rather than shipped with every page.
+    get '/:version/command_palette', to: 'framework#command_palette', constraints: { version: framework_docs_version_constraint }, defaults: { version: current_docs_version }, as: :framework_docs_command_palette, format: false
+
     framework_docs_components.each do |component|
       get "/:version/#{component}", to: "framework##{component}", as: "framework_docs_#{component}", constraints: { version: framework_docs_version_constraint }, defaults: { version: current_docs_version }, format: false
     end
@@ -106,6 +109,7 @@ scope :framework do
   # Examples routes
   scope :examples do
     get '/', to: 'framework#examples_index', as: :framework_examples_index
+    get '/command_palette', to: 'framework#command_palette', as: :framework_examples_command_palette, format: false
     get "/:id", to: "framework#layout_example_show", as: :framework_example_show
   end
 

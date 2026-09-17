@@ -752,6 +752,15 @@ module FrameworkHelper
     params[:controller] == 'framework' && refresh_pages.include?(params[:action])
   end
 
+  # Where the command palette fetches the list framework_nav_groups would render.
+  def command_palette_items_path
+    if current_section == :examples
+      framework_examples_command_palette_path
+    else
+      framework_docs_command_palette_path(version: current_docs_version)
+    end
+  end
+
   def framework_nav_groups
     if current_section == :examples
       build_examples_nav_groups

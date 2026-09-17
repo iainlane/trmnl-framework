@@ -184,6 +184,10 @@ class FrameworkController < Framework.parent_controller_class
     }
   end
 
+  def command_palette
+    render partial: 'framework/command_palette_items'
+  end
+
   def examples_index
     @og_description = 'Framework UI examples.'
   end
@@ -543,7 +547,8 @@ class FrameworkController < Framework.parent_controller_class
   def current_section
     @current_section ||= if action_name == 'index'
                            nil
-                         elsif %w[layout_example_show layout_examples examples_index].include?(action_name)
+                         elsif %w[layout_example_show layout_examples examples_index].include?(action_name) ||
+                               request.path.start_with?('/framework/examples')
                            :examples
                          elsif action_name == 'releases_index'
                            :releases
@@ -681,12 +686,15 @@ class FrameworkController < Framework.parent_controller_class
   end
 
   def versioned_docs_component_request?
-    versioned_docs_request? && action_name != 'docs_index' && action_name != 'example_iframe_config'
+    versioned_docs_request? && action_name != 'docs_index' && !docs_fragment_request?
   end
 
   def versioned_docs_template_request?
-    versioned_docs_request? && action_name != 'example_iframe_config'
+    versioned_docs_request? && !docs_fragment_request?
   end
+
+  # Actions under /framework/docs/:version that answer a piece of a page, not a page.
+  def docs_fragment_request? = %w[example_iframe_config command_palette].include?(action_name)
 
   def validate_versioned_docs_page!
     return if docs_pages.include?(action_name)
