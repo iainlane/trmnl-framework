@@ -50,11 +50,8 @@ export default class extends Controller {
   ]
 
   static values = {
-    models: Array,
-    palettes: Array,
     refresh: Boolean,
     scope: String,
-    themes: { type: Array, default: [] },
     dropdownItemBase: { type: String, default: 'flex items-center w-full px-2 py-1.5 rounded-md text-xs cursor-pointer transition-colors' },
     dropdownItemActive: { type: String, default: 'text-primary-700 dark:text-primary-300 font-semibold bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50' },
     dropdownItemInactive: { type: String, default: 'text-gray-600 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700' },
@@ -67,6 +64,12 @@ export default class extends Controller {
     deviceKey: { type: String, default: '' },
   }
 
+  // The page's one #fancy-screen-picker-catalog script: models, palettes and themes.
+  get catalog() {
+    this._catalog ||= JSON.parse(document.getElementById('fancy-screen-picker-catalog').textContent)
+    return this._catalog
+  }
+
   async connect() {
     this.pickerId = Math.random().toString(36).substring(2, 15)
     this.pageId = this.screenPickerPageId
@@ -74,8 +77,8 @@ export default class extends Controller {
     // Captured before create(), since the picker persists its own default on first load.
     const hadSavedPrefs = !urlOverrides && !!localStorage.getItem(this.prefsKey)
     this.picker = await TRMNLPicker.create(this.element, {
-      models: this.modelsValue,
-      palettes: this.palettesValue,
+      models: this.catalog.models,
+      palettes: this.catalog.palettes,
       localStorageKey: urlOverrides ? undefined : this.prefsKey,
     })
     this.colorPreviewMode = this.loadColorPreviewMode()
@@ -320,7 +323,7 @@ export default class extends Controller {
     if (!paletteSelect) return ''
 
     const paletteId = paletteSelect.value
-    const palette = this.palettesValue.find(p => p.id === paletteId)
+    const palette = this.catalog.palettes.find(p => p.id === paletteId)
     if (!palette) return ''
 
     const isColor = palette.grayscale_bit_depth !== undefined && palette.grayscale_bit_depth !== null
@@ -808,7 +811,7 @@ export default class extends Controller {
   }
 
   normalizeTheme(value) {
-    const themeIds = (this.themesValue || []).map(theme => theme.id)
+    const themeIds = this.catalog.themes.map(theme => theme.id)
     return themeIds.includes(value) ? value : 'none'
   }
 
@@ -922,8 +925,8 @@ export default class extends Controller {
 
   get selectedModelFromCatalog() {
     const keyname = this.selectedModelKeyname
-    if (!keyname || !Array.isArray(this.modelsValue)) return null
-    return this.modelsValue.find((model) => String(model?.name) === keyname) || null
+    if (!keyname) return null
+    return this.catalog.models.find((model) => String(model?.name) === keyname) || null
   }
 
   get previewWhitePoint() {
