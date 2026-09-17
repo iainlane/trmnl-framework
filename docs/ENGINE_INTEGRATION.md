@@ -40,7 +40,7 @@ unprefixed (`framework_docs_*_path`).
 There is none. The engine asks the host nothing about the visitor: no
 `current_user`, no `user_signed_in?`, no admin flag. Docs pages are public and
 identical for everyone, so the page cache key is built from the URL, the locale,
-the release stamp and the live-build flag alone.
+the gem version and the live-build flag alone.
 
 Earlier versions required `current_user` and `user_signed_in?`, and
 `Framework::HostCompat` supplied guest defaults for hosts that had neither. Both
