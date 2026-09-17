@@ -149,6 +149,25 @@ RSpec.describe 'Framework docs routing', type: :request do
     end
   end
 
+  # Both pickers on a page (menubar and mobile nav) read one catalog, instead of each
+  # carrying the 56 KB models list in its own data attribute.
+  describe 'the screen picker catalog' do
+    before { get "/framework/docs/#{current_version}/label" }
+
+    it 'is on the page once' do
+      expect(response.body.scan('id="fancy-screen-picker-catalog"').size).to eq(1)
+    end
+
+    it 'holds the models, palettes and themes' do
+      catalog = JSON.parse(response.body[%r{id="fancy-screen-picker-catalog">(.*?)</script>}m, 1])
+      expect(catalog.keys).to eq(%w[models palettes themes])
+    end
+
+    it 'is not repeated on the pickers' do
+      expect(response.body).not_to include('data-fancy-screen-picker-models-value')
+    end
+  end
+
   # Devices and Rendering Modes shipped with 3.2 and describe the mode registry in
   # base/_screen-mode-vars.scss. The palette classes on the Rendering Modes page are
   # generated from the device manifest, so a palette added there has to reach the page.

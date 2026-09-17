@@ -46,14 +46,16 @@
   section_label_classes = menubar_dropdown_group_label_classes
 %>
 
+<%# Standalone docs: the picker payloads come from the manifest core exports
+    (in core these are API::Public::{Models,Palettes}Controller). Emitted once per page,
+    ahead of the first picker, so every picker reads the same catalog. %>
+<% unless @fancy_screen_picker_catalog_rendered %>
+  <% @fancy_screen_picker_catalog_rendered = true %>
+  <script type="application/json" id="fancy-screen-picker-catalog"><%== json_escape({ models: Framework::Devices.picker_models, palettes: Framework::Devices.picker_palettes, themes: framework_theme_options }.to_json) %></script>
+<% end %>
 <div id="fancy-screen-picker-component"
     class="<%= container_class %>"
     data-controller="fancy-screen-picker"
-    <%# Standalone docs: the picker payloads come from the manifest core exports
-        (in core these are API::Public::{Models,Palettes}Controller). %>
-    data-fancy-screen-picker-models-value="<%= Framework::Devices.picker_models.to_json %>"
-    data-fancy-screen-picker-palettes-value="<%= Framework::Devices.picker_palettes.to_json %>"
-    data-fancy-screen-picker-themes-value="<%= framework_theme_options.to_json %>"
     data-fancy-screen-picker-scope-value="<%= scope %>"
     data-fancy-screen-picker-default-model-value="<%= default_model_keyname %>"
     data-fancy-screen-picker-default-palette-value="<%= default_palette_id %>"

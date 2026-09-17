@@ -433,11 +433,13 @@ RSpec.describe 'Engine host contract' do
   # .admin? and user_signed_in?, none of which this repo can answer, and the only view
   # that branched on them was a nav partial nothing rendered.
   describe 'no visitor contract' do
+    # The host's release stamp used to be in the key too, so a host deploying dozens of
+    # times a day re-cached every page each time and kept every old copy for its TTL.
     it 'keys the page cache on the request, the gem version and the build alone', type: :request do
       get "/framework/docs/#{FrameworkController::CURRENT_DOCS_VERSION}/screen"
 
       expect(controller.send(:page_cache_key)).to eq(
-        ['framework-page', Framework::VERSION, Rails.root.basename.to_s, 'http://www.example.com',
+        ['framework-page', Framework::VERSION, 'http://www.example.com',
          "/framework/docs/#{FrameworkController::CURRENT_DOCS_VERSION}/screen", :en,
          Framework::Version.development_mode?]
       )

@@ -184,6 +184,10 @@ class FrameworkController < Framework.parent_controller_class
     }
   end
 
+  def command_palette
+    render partial: 'framework/command_palette_items'
+  end
+
   def examples_index
     @og_description = 'Framework UI examples.'
   end
@@ -480,17 +484,10 @@ class FrameworkController < Framework.parent_controller_class
   end
 
   def page_cache_key
-    # NOTE: Rails.root basename is the release stamp on Hatchbox, so deploys
-    # invalidate cached pages; base_url covers absolute URLs in the body.
-    #
-    # A live rebuild moves neither of those, so the newest build mtime joins the key
-    # while the host serves live. It is nil in every deployed mode, which leaves the
-    # production key shape untouched. The version is already in fullpath, so this is
-    # keyed on the host's mode rather than on the page's scoped one.
-    #
-    # A host that upgrades the gem moves none of the above, so the gem version is in the
-    # key too: without it the deploy that ships new chrome replays the old HTML for 12h.
-    @page_cache_key ||= ['framework-page', Framework::VERSION, Rails.root.basename.to_s, request.base_url,
+    # NOTE: base_url covers absolute URLs in the body. The build fingerprint is the newest
+    # build mtime while the host serves live, nil in every deployed mode. The gem version
+    # busts the chrome on upgrade, and the host's own deploys leave the pages as they are.
+    @page_cache_key ||= ['framework-page', Framework::VERSION, request.base_url,
                          request.fullpath, I18n.locale,
                          Framework::Version.development_mode?,
                          docs_serving_mode.build_fingerprint].compact
@@ -543,7 +540,8 @@ class FrameworkController < Framework.parent_controller_class
   def current_section
     @current_section ||= if action_name == 'index'
                            nil
-                         elsif %w[layout_example_show layout_examples examples_index].include?(action_name)
+                         elsif %w[layout_example_show layout_examples examples_index].include?(action_name) ||
+                               request.path.start_with?('/framework/examples')
                            :examples
                          elsif action_name == 'releases_index'
                            :releases
@@ -681,12 +679,15 @@ class FrameworkController < Framework.parent_controller_class
   end
 
   def versioned_docs_component_request?
-    versioned_docs_request? && action_name != 'docs_index' && action_name != 'example_iframe_config'
+    versioned_docs_request? && action_name != 'docs_index' && !docs_fragment_request?
   end
 
   def versioned_docs_template_request?
-    versioned_docs_request? && action_name != 'example_iframe_config'
+    versioned_docs_request? && !docs_fragment_request?
   end
+
+  # Actions under /framework/docs/:version that answer a piece of a page, not a page.
+  def docs_fragment_request? = %w[example_iframe_config command_palette].include?(action_name)
 
   def validate_versioned_docs_page!
     return if docs_pages.include?(action_name)

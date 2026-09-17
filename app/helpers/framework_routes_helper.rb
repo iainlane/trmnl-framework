@@ -15,6 +15,8 @@ module FrameworkRoutesHelper
     framework_example_show
     framework_layout_examples
     framework_releases_index
+    framework_icons
+    framework_examples_command_palette
   ].freeze
 
   UNVERSIONED_FRAMEWORK_ROUTES.each do |route|

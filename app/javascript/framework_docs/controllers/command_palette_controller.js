@@ -15,8 +15,8 @@ import {
 
 // Command Palette Controller (Cmd+K)
 //
-// Items are the docs index of the page's section, server-rendered into the list. They
-// are cached flat (itemsCache) and grouped into sections on the first open.
+// Items are the docs index of the page's section, fetched from itemsUrl into the list on
+// the first open. They are cached flat (itemsCache) and grouped into sections.
 //
 // Search strategies (two code paths, same entry point, applyFilter):
 //   No query  → _filterSectionsDefault: show defaultVisible items, preserve section order
@@ -32,6 +32,8 @@ import {
 //   onInput → applyFilter → filterAndSortSections → updateTopResult → updateEmptyState
 //
 export default class extends Controller {
+  static values = { itemsUrl: String }
+
   static targets = [
     "backdrop",
     "frame",
@@ -172,9 +174,25 @@ export default class extends Controller {
 
   // Cached once; a later open re-runs the filter, which re-attaches what a search detached.
   loadItems() {
-    if (!this.itemsCache.length) this.rebuildCache()
+    if (this.itemsCache.length) return this.applyFilter("")
 
-    this.applyFilter("")
+    this.fetchItems()
+  }
+
+  // The list arrives after the palette opens, so the filter re-runs on whatever was typed meanwhile.
+  async fetchItems() {
+    if (this.itemsRequest || !this.hasItemsUrlValue) return
+
+    this.itemsRequest = fetch(this.itemsUrlValue, { headers: { Accept: "text/html" } })
+    const response = await this.itemsRequest
+    if (!response.ok) {
+      this.itemsRequest = null
+      return
+    }
+
+    this.listTarget.insertAdjacentHTML("beforeend", await response.text())
+    this.rebuildCache()
+    this.applyFilter(this.getInputValue().toLowerCase().trim())
   }
   // ========== Keyboard & Pointer Events ==========
 

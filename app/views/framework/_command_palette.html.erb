@@ -1,8 +1,7 @@
-<%# The docs command palette: every page of the section, server-rendered into its list. %>
-<% titles = page_titles %>
-<% section_name = current_section.to_s.humanize %>
+<%# The docs command palette. Its list is fetched from the items URL on first open. %>
 
 <div data-controller="command-palette"
+     data-command-palette-items-url-value="<%= command_palette_items_path %>"
      class="hidden fixed inset-0 z-[200]"
      aria-hidden="true"
      data-action="click->command-palette#onOutsideClick">
@@ -54,41 +53,6 @@
               No results found
             </div>
 
-            <% framework_nav_groups.each do |group_key, page_keys| %>
-              <% group_name = "#{section_name} - #{group_key.to_s.humanize}" %>
-              <h3 class="mb-2 mt-3 text-xs font-medium text-gray-600 dark:text-gray-400"
-                  data-command-palette-target="sectionHeader"
-                  data-group="<%= group_name %>"><%= group_name %></h3>
-              <% page_keys.each do |page_key| %>
-                <% title = titles[page_key] || page_key.to_s.titleize %>
-                <% description = page_description(page_key) %>
-                <% href = framework_page_path(page_key) %>
-                <div class="group flex cursor-default items-center rounded-2xl p-2 select-none text-gray-700 dark:text-gray-300 aria-selected:bg-sage-75/80 dark:aria-selected:bg-sage-850 aria-selected:ring-1 aria-selected:ring-sage-100 dark:aria-selected:ring-sage-800 aria-selected:text-sage-700 dark:aria-selected:text-sage-400"
-                     role="option"
-                     aria-selected="false"
-                     data-command-palette-target="item"
-                     data-action="mouseenter->command-palette#onItemMouseEnter click->command-palette#onItemClick"
-                     data-key="<%= page_key %>"
-                     data-title="<%= title %>"
-                     data-description="<%= description %>"
-                     data-group="<%= group_name %>"
-                     data-href="<%= href %>">
-                  <a class="flex items-center gap-3 no-underline focus:outline-none w-full" href="<%= href %>">
-                    <span class="js-cmdp-icon flex-none text-gray-500 dark:text-gray-600 w-10 h-10 [&>svg]:w-full [&>svg]:h-full group-aria-selected:text-sage-500 dark:group-aria-selected:text-sage-500"><%= page_icon(page_key, 'w-6 h-6') %></span>
-                    <span class="flex-auto truncate">
-                      <span class="block truncate font-medium text-gray-900 dark:text-gray-550 group-aria-selected:text-sage-700 dark:group-aria-selected:text-sage-100"><%= title %></span>
-                      <% if description.present? %>
-                        <span class="block truncate text-xs text-gray-400 dark:text-gray-600 dark:group-aria-selected:text-sage-400"><%= description %></span>
-                      <% end %>
-                    </span>
-                    <span class="ml-3 hidden group-aria-selected:inline text-sm leading-tight text-sage-400 dark:text-sage-500 whitespace-nowrap"
-                          data-command-palette-action-hint>
-                      <kbd class="mx-1 flex h-5 px-2 items-center justify-center rounded-xl bg-white px-1 text-sage-600 dark:bg-gray-800 dark:text-sage-400 inline-flex text-xs">enter</kbd>
-                    </span>
-                  </a>
-                </div>
-              <% end %>
-            <% end %>
           </div>
         </div>
 
