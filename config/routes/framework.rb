@@ -40,6 +40,9 @@ scope :framework do
   get '/tiles/:z/:x/:y', to: 'framework_tiles#show', as: :framework_tiles,
                          constraints: { z: /\d{1,2}/, x: /\d+/, y: /\d+/, format: /mvt/ }, defaults: { format: 'mvt' }
 
+  # Every docs icon is a <use> into this one sheet, fetched once per icon set.
+  get '/icons.svg', to: 'framework_icons#show', as: :framework_icons, format: false
+
   if draw_test_harness
     scope :test do
       get "/overflow", to: 'framework_tests#overflow', as: :framework_test_overflow
