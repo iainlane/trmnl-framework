@@ -193,36 +193,40 @@
                 background-image: var(--framework-semantic-surface-bg-image, none);
                 background-repeat: repeat;
                 background-size: var(--dither-bg-size, auto);
+            }
+        }
+    }
 
-                > .view {
-                    width: 100% !important;
-                    height: 100% !important;
-                    // The cell owns the surface fill; the inner view is a plain
-                    // content holder so cells never double the fill.
-                    background-color: transparent;
-                    background-image: none;
-                    border-radius: 0;
-                }
+    .mashup-cell {
+        display: contents;
 
-                // Fill the cell (any size) instead of the fixed per-size-class
-                // heights that standalone views use. margin-bottom is reset
-                // because view--full adds one below its layout when a title bar
-                // follows, which would push the cell content past the frame.
-                > .view > .layout {
-                    height: 100%;
-                    padding: var(--gap);
-                    margin-bottom: 0;
+        > .view {
+            width: 100% !important;
+            height: 100% !important;
+            // The cell owns the surface fill; the inner view is a plain
+            // content holder so cells never double the fill.
+            background-color: transparent;
+            background-image: none;
+            border-radius: 0;
+        }
 
-                    &:has(+ .title_bar) {
-                        height: calc(100% - var(--title-bar-small-height));
-                    }
+        // Fill the cell (any size) instead of the fixed per-size-class
+        // heights that standalone views use. margin-bottom is reset
+        // because view--full adds one below its layout when a title bar
+        // follows, which would push the cell content past the frame.
+        > .view > .layout {
+            height: 100%;
+            padding: var(--gap);
+            margin-bottom: 0;
 
-                    &.gap--auto,
-                    &.gap--space-between {
-                        padding-top: 0;
-                        padding-bottom: 0;
-                    }
-                }
+            &:has(+ .title_bar) {
+                height: calc(100% - var(--title-bar-small-height));
+            }
+
+            &.gap--auto,
+            &.gap--space-between {
+                padding-top: 0;
+                padding-bottom: 0;
             }
         }
     }
